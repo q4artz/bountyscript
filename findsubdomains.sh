@@ -40,8 +40,8 @@ echo "[+] Running Httprobe"
 cat $url/recon/assetfinderSubs.txt | sort -u | httprobe -s -p https:443| sed 's/https\?:\/\///' | tr -d ':443' >> $url/recon/aliveSubs.txt
 echo -e "[+] Httprobe found " $(cat $url/recon/aliveSubs.txt | wc -l) "Alive subdomains\n"
 
-#capturing screenshots with gowitness
+#capturing screenshots with eyewitness
 echo "[+] Running Eyewitness"
-eyewitness --web -f $url/recon/aliveSubs.txt -d $url/recon/aliveScreenshots --resolve
+yes Y | eyewitness --web -f $url/recon/aliveSubs.txt -d $url/recon/aliveScreenshots --resolve --delay 10 --threads 15
 echo "[+] Screenshots put into " $url/recon/aliveScreenshots 
 
