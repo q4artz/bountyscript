@@ -41,9 +41,12 @@ cat $url/recon/assetfinderSubs.txt | sort -u | httprobe -s -p https:8080 >> $url
 echo -e "[+] Httprobe found " $(cat $url/recon/aliveSubs.txt | wc -l) "Alive subdomains\n"
 
 #capturing screenshots with eyewitness
-echo "[+] Running Eyewitness"
-#yes Y | eyewitness --web -f $url/recon/aliveSubsclean.txt -d $url/recon/aliveScreenshots --resolve --delay 10 --threads 15
+echo "[+] Running Eyewitness on alive subdomains"
+#yes Y | eyewitness --web -f $url/recon/aliveSubsclean.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
 echo "[+] Screenshots put into " $url/recon/aliveScreenshots 
+
+#Getting all subdomains/domain's Ipaddr for dirbusting
+
 
 #dirbusting 
 echo "[+] Running FFUF"
