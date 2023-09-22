@@ -5,15 +5,16 @@ url=$1
 
 #check if directory exist
 if [ ! -d "$url" ]; then 
-mkdir $url
+	sudo -u kali mkdir $url
 fi
-
 if [ ! -d "$url/recon" ];then
-mkdir $url/recon
+	sudo -u kali mkdir $url/recon
 fi
-
+if [ ! -d "$url/recon/dnsreconScan" ];then
+	sudo -u kali mkdir $url/recon/dnsreconScan
+fi
 if [ ! -d "$url/recon/aliveScreenshots" ];then
-mkdir $url/recon/aliveSreenshots
+	sudo -u kali mkdir $url/recon/aliveSreenshots
 fi
 
 #running assetfinder
@@ -36,18 +37,30 @@ echo -e "\n"
 
 #running httprobe
 echo "[+] Running Httprobe"
-cat $url/recon/assetfinderSubs.txt | sort -u | httprobe -s -p https:443| sed 's/https\?:\/\///' | tr -d ':443' >> $url/recon/aliveSubsclean.txt
-cat $url/recon/assetfinderSubs.txt | sort -u | httprobe -s -p https:8080 >> $url/recon/aliveSubsdirty.txt
+cat $url/recon/assetfinderSubs.txt | sort -u | httprobe -s -p https:443| sed 's/https\?:\/\///' | tr -d ':443' >> $url/recon/aliveSub.txt
 echo -e "[+] Httprobe found " $(cat $url/recon/aliveSubs.txt | wc -l) "Alive subdomains\n"
+
+#Getting all subdomain's ipaddr
+echo "[+] Running dnsrecon"
+IFS=$'\r\n' GLOBIGNORE='*' command eval  'subdomain=($(cat $url/recon/aliveSub.txt))'
+for line in ${subdomain[@]} ; do dnsrecon -d $line -x $url/recon/dnsreconScan/$line-IP.xml -c $url/recon/dnsreconScan/$line-IP.csv -j $url/recon/dnsreconScan/$line-IP.json ; done
+
+for $subdomain in "${subdomain[@]}" 
+do
+	for line in $url/recon/dnsreconScan/$subdomain-IP.json
+	do
+		grep -o '"address": *"[^"]*"'  $url/recon/dnsreconScan/subdomainIP.json | grep -o '"[^"]*"$' >> $url/recon/dnsreconScan/temp.txt
+		cat $url/recon/dnsreconScan/temp.txt | tr -d '"' | sort >> $url/recon/dnsreconScan/allIP.txt 
+		rm $url/recon/dnsreconScan/temp.txt
+		grep -E -o '[0-9_.]{10,}' $url/recon/dnsreconScan/alladdress.txt > $url/recon/dnsreconScan/allIPv4.txt
+	done
+done
+
+echo -e "[+] Address founded are...\n"
+cat $url/recon/dnsreconScan/allIPv4.txt
+
 
 #capturing screenshots with eyewitness
 echo "[+] Running Eyewitness on alive subdomains"
-#yes Y | eyewitness --web -f $url/recon/aliveSubsclean.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
+#yes Y | eyewitness --web -f $url/recon/aliveSub.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
 echo "[+] Screenshots put into " $url/recon/aliveScreenshots 
-
-#Getting all subdomains/domain's Ipaddr for dirbusting
-
-
-#dirbusting 
-echo "[+] Running FFUF"
-for line in $url/recon/aliveSubsdirty.txt ; do ffuf -u $line/FUZZ -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -mc 200 -p 2  ; done
