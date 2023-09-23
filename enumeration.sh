@@ -1,12 +1,13 @@
 #!/bin/bash
 
-echo "enumeration script takes in | ip addr | nmap scan mode"
+echo "enumeration script takes in | ip addr (provide the file if it is a file) | nmap scan mode"
 echo "-sS | Nmap stealth scan (-sS -T2 -disable-arp-ping --top-ports 20)"
 echo "-n  | Nmap normal scan (-Pn -T3 -A)"
 
 ipaddr=$1
 scanmode=$2
 
+# creating required directories
 if [ ! -d "enumeration" ]; then
 	sudo -u kali mkdir enumeration
 fi
@@ -30,17 +31,22 @@ if [ ! -d "enumeration/searchsploitScan" ]; then
 fi
 
 # nmap script take in ip addr | scan mode 
-sudo nmap -n $ipaddr -oG - | awk '/Up$/{print $2}' > enumeration/nmapScan/hostup.txt
+if [ -f $ipaddr ]; then
+	IFS=$'\r\n' GLOBIGNORE='*' command eval  'XYZ=($(cat $ipaddr))'
+else  
+	sudo nmap -n $ipaddr -oG - | awk '/Up$/{print $2}' > enumeration/nmapScan/hostup.txt
 
-IFS=$'\r\n' GLOBIGNORE='*' command eval  'XYZ=($(cat enumeration/nmapScan/hostup.txt))'
+	IFS=$'\r\n' GLOBIGNORE='*' command eval  'XYZ=($(cat enumeration/nmapScan/hostup.txt))'
+fi
 
+# Initiating nmap scans
 echo -e "[+] Initiating Nmap scans for ${XYZ[*]} \n"
 
 if [ $scanmode == "-sS" ]; then
 	for line in "${XYZ[@]}" ; do sudo nmap $line -sS -Pn -T2 -oG enumeration/nmapScan/$line-grep.txt -oN enumeration/nmapScan/$line-text.txt ; done
 fi
 if [ $scanmode == "-n" ]; then
-	for line in "${XYZ[@]}" ; do sudo nmap $line -A -Pn -oG enumeration/nmapScan/$line-grep.txt -oN enumeration/nmapScan/$line-text.txt ; done
+	for line in "${XYZ[@]}" ; do sudo nmap $line -A -Pn --script=vuln -oG enumeration/nmapScan/$line-grep.txt -oN enumeration/nmapScan/$line-text.txt ; done
 fi
 
 #put all nmap results into a single file for better viewing
@@ -56,10 +62,11 @@ do
     for line in enumeration/nmapScan/$IP-openPorts.txt
     do
        if [ $(grep -c "53" enumeration/nmapScan/$IP-openPorts.txt) -eq 1 ]; then 
+		echo -e "[+] Port 53 is Open! \n Engaging in Reverse dns lookup for $IP ! \n"
 		dnsrecon -r 127.0.0.1/24 -n $IP -d blah -x enumeration/dnsrecon/$IP.xml -c enumeration/dnsrecon/$IP.csv -j enumeration/dnsrecon/$IP.json
 		if [ $(grep -c "PTR" enmeration/dnsrecon/$IP.xml) ]; then
+			echo -e "\n[+] Running fierce on domain\n"
 #			fierce domain > fierce$Domain.txt
-			echo "this works"
 		fi
 	fi
 	if [ $(grep -c "8080" enumeration/nmapScan/$IP-openPorts.txt) -eq 1 ]; then
