@@ -3,18 +3,22 @@
 #getting arguements
 url=$1
 
+#check who is the user
+username=$(uname -n) 
+echo "user is $username" 
+
 #check if directory exist
 if [ ! -d "$url" ]; then 
-	sudo -u kali mkdir $url
+	sudo -u $username mkdir $url
 fi
 if [ ! -d "$url/recon" ];then
-	sudo -u kali mkdir $url/recon
+	sudo -u $username mkdir $url/recon
 fi
 if [ ! -d "$url/recon/dnsreconScan" ];then
-	sudo -u kali mkdir $url/recon/dnsreconScan
+	sudo -u $username mkdir $url/recon/dnsreconScan
 fi
 if [ ! -d "$url/recon/aliveScreenshots" ];then
-	sudo -u kali mkdir $url/recon/aliveSreenshots
+	sudo -u $username mkdir $url/recon/aliveSreenshots
 fi
 
 #running assetfinder
@@ -62,5 +66,5 @@ cat $url/recon/dnsreconScan/allIPv4.txt
 
 #capturing screenshots with eyewitness
 echo "[+] Running Eyewitness on alive subdomains"
-#yes Y | eyewitness --web -f $url/recon/aliveSub.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
+yes Y | eyewitness --web -f $url/recon/aliveSub.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
 echo "[+] Screenshots put into " $url/recon/aliveScreenshots 
