@@ -45,14 +45,14 @@ echo "[+] Running dnsrecon"
 IFS=$'\r\n' GLOBIGNORE='*' command eval  'subdomain=($(cat $url/recon/aliveSub.txt))'
 for line in ${subdomain[@]} ; do dnsrecon -d $line -x $url/recon/dnsreconScan/$line-IP.xml -c $url/recon/dnsreconScan/$line-IP.csv -j $url/recon/dnsreconScan/$line-IP.json ; done
 
-for $subdomain in "${subdomain[@]}" 
+for subs in "${subdomain[@]}" 
 do
-	for line in $url/recon/dnsreconScan/$subdomain-IP.json
+	for line in $url/recon/dnsreconScan/$subs-IP.json
 	do
-		grep -o '"address": *"[^"]*"'  $url/recon/dnsreconScan/subdomainIP.json | grep -o '"[^"]*"$' >> $url/recon/dnsreconScan/temp.txt
+		grep -o '"address": *"[^"]*"'  $line | grep -o '"[^"]*"$' >> $url/recon/dnsreconScan/temp.txt
 		cat $url/recon/dnsreconScan/temp.txt | tr -d '"' | sort >> $url/recon/dnsreconScan/allIP.txt 
 		rm $url/recon/dnsreconScan/temp.txt
-		grep -E -o '[0-9_.]{10,}' $url/recon/dnsreconScan/alladdress.txt > $url/recon/dnsreconScan/allIPv4.txt
+		grep -E -o '[0-9_.]{10,}' $url/recon/dnsreconScan/allIP.txt > $url/recon/dnsreconScan/allIPv4.txt
 	done
 done
 
