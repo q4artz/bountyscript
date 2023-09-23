@@ -4,30 +4,35 @@ echo "enumeration script takes in | ip addr (provide the file if it is a file) |
 echo "-sS | Nmap stealth scan (-sS -T2 -disable-arp-ping --top-ports 20)"
 echo "-n  | Nmap normal scan (-Pn -T3 -A)"
 
+#getting arguements
 ipaddr=$1
 scanmode=$2
 
+#check who is the user
+username=$(uname -n) 
+echo "user is $username" 
+
 # creating required directories
 if [ ! -d "enumeration" ]; then
-	sudo -u kali mkdir enumeration
+	sudo -u $username mkdir enumeration
 fi
 if [ ! -d "enumeration/nmapScan" ]; then
-	sudo -u kali mkdir enumeration/nmapScan
+	sudo -u $username mkdir enumeration/nmapScan
 fi
 if [ ! -d "enumeration/dnsreconScan" ]; then
-	sudo -u kali mkdir enumeration/dnsrecon
+	sudo -u $username mkdir enumeration/dnsrecon
 fi
 if [ ! -d "enumeration/fierceScan" ]; then
-	sudo -u kali mkdir enumeration/fierce
+	sudo -u $username mkdir enumeration/fierce
 fi
 if [ ! -d "enumeration/ffufScan" ]; then
-	sudo -u kali mkdir enumeration/ffufScan
+	sudo -u $username mkdir enumeration/ffufScan
 fi
 if [ ! -d "enumeration/enum4linux-ngScan" ]; then
-	sudo -u kali mkdir enumeration/enum4linux-ngScan
+	sudo -u $username mkdir enumeration/enum4linux-ngScan
 fi
 if [ ! -d "enumeration/searchsploitScan" ]; then
-	sudo -u kali mkdir enumeration/searchsploitScan
+	sudo -u $username mkdir enumeration/searchsploitScan
 fi
 
 # nmap script take in ip addr | scan mode 
