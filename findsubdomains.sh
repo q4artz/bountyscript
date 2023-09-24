@@ -66,5 +66,5 @@ cat $url/recon/dnsreconScan/allIPv4.txt
 
 #capturing screenshots with eyewitness
 echo "[+] Running Eyewitness on alive subdomains"
-yes Y | eyewitness --web -f $url/recon/aliveSub.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
+#yes Y | eyewitness --web -f $url/recon/aliveSub.txt -d $url/recon/aliveScreenshots --resolve --delay 5 --threads 15
 echo "[+] Screenshots put into " $url/recon/aliveScreenshots 
