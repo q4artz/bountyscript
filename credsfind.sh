@@ -22,14 +22,20 @@ if [ ! -d "$domain-creds/breachparseScan" ]; then
 fi
 
 #Run theHarvester
-sudo theHarvester -d $domain -b all -f $domain-creds/theHarvesterScan/$domain-theHarvester
+echo -e "[+] Running theHarvester..."
+sudo theHarvester -d $domain -b all -f $domain-creds/theHarvesterScan/
+echo -e "[+] Finished Running theHarvester..."
 
 #sort theHarvester emails into text file fro h8mail
-grep -o '"emails": *"[^"]*"'  $line | grep -o '"[^"]*"$' >> $domain-creds/theHarvesterScan/temp.txt
-cat $domain-creds/theHarvesterScan/temp.txt | tr -d '"' | sort >> $domain-creds/theHarvesterScan/allemails.txt 
-rm $domain-creds/theHarvesterScan/temp.txt
+echo -e "[+] Extracting emails from theHarvester's file..."
+grep -oP '(?<=<email>).*?(?=</email>)' $domain-creds/theHarvesterScan/$(echo "$domain" | tr -d .com).xml > $domain-creds/theHarvesterScan/allemail.txt 
+echo -e "[+] Finished Extracting emails..."
 
 #Run h8mail
-sudo h8mail -t emails.txt -c config.ini -o $domain-creds/h8mailScan/h8mailinfo.csv -j $domain-creds/h8mailScan/h8mailinfo.json
+echo -e "[+] Running h8mail..."
+sudo h8mail -t $domain-creds/theHarvesterScan/allemail.txt -c config.ini -o $domain-creds/h8mailScan/h8mailinfo.csv -j $domain-creds/h8mailScan/h8mailinfo.json
+echo -e "[+] FinishedRunning h8mail..."
 
 #Run breach-Parse
+echo -e "[+] Running breach-Parse..."
+echo -e "[+] Finished Running breach-Parse..."
